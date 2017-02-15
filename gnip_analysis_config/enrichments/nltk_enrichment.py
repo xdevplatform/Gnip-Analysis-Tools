@@ -1,6 +1,7 @@
 from .enrichments import BaseEnrichment
 from nltk.tokenize import SpaceTokenizer
 from nltk.tokenize import word_tokenize
+from nltk.tokenize.casual import TweetTokenizer
 from nltk.tag import pos_tag
 
 class NLTKSpaceTokenizeBody(BaseEnrichment):
@@ -14,6 +15,13 @@ class NLTKWordTokenizeBody(BaseEnrichment):
     """Use the default NLTK word tokenizer to parse the Tweet body."""
     def __init__(self):
         self.tokenizer = word_tokenize
+    def enrichment_value(self,tweet):
+        return self.tokenizer(tweet['body'])
+
+class NLTKTweetTokenizeBody(BaseEnrichment):
+    """Use the NLTK Tweet tokenizer to parse the Tweet body."""
+    def __init__(self):
+        self.tokenizer = TweetTokenizer().tokenize
     def enrichment_value(self,tweet):
         return self.tokenizer(tweet['body'])
 
@@ -50,6 +58,11 @@ class NLTKWordTokenizeBio(NLTKTokenizeBio):
     def __init__(self):
         self.tokenize = word_tokenize
 
+class NLTKTweetTokenizeBio(NLTKTokenizeBio):
+    """Use the NLTK Tweet tokenizer to parse the Tweet body."""
+    def __init__(self):
+        self.tokenize = TweetTokenizer().tokenize
+
 class NLTKPOSBio(BaseEnrichment):
     """Use the NLTK part-of-speech tagger on the Tweet body tokens."""
     def __init__(self):
@@ -60,8 +73,10 @@ class NLTKPOSBio(BaseEnrichment):
 nltk_enrichments_list = [
         NLTKSpaceTokenizeBody,
         NLTKWordTokenizeBody,
+        NLTKTweetTokenizeBody,
         NLTKPOSBody,
         NLTKSpaceTokenizeBio,
         NLTKWordTokenizeBio,
+        NLTKTweetTokenizeBio,
         NLTKPOSBio,
         ]
