@@ -25,5 +25,6 @@ def term_comparator(term1, term2):
     return t1 == t2
 
 def sanitize_string(input_str):
-    output_str = input_str
+    output_str = input_str.replace('"','\"').replace(",","COMMA")
     return output_str
+

@@ -1,6 +1,6 @@
 import collections
 import operator
-from utils import token_ok, term_comparator
+from gnip_analysis_tools.nlp.utils import token_ok, term_comparator, sanitize_string
 
 """
 
@@ -50,7 +50,7 @@ is true.
 
 class naming convention: 
     classes that implement 'get' should contain 'Get' in the name
-    classes defining counters should contain 'Counter' or 'Counters' in the name
+    classes defining counters variables should contain 'Counter' or 'Counters' in the name
 
 """
 class MeasurementBase(object):
@@ -59,6 +59,9 @@ class MeasurementBase(object):
     It implements 'get_name' and 'add_tweet'. 
     Note that 'add_tweet' calls 'update', 
     which must be defined in a derived class."""
+    def __init__(self, **kwargs):
+        """ basic ctor to add arguments as class attributes"""
+        [setattr(self,key,value) for key,value in kwargs.items()]
     def get_name(self):
         return self.__class__.__name__
     def add_tweet(self,tweet):
@@ -91,7 +94,7 @@ class MeasurementBase(object):
 class Counter(MeasurementBase):
     """ base class for any single integer counter """
     def __init__(self, **kwargs): 
-        [setattr(self,key,value) for key,value in kwargs.items()]
+        super().__init__(**kwargs)
         self.counter = 0
     def get(self):
         return [(self.counter,self.get_name())]
@@ -101,7 +104,7 @@ class Counter(MeasurementBase):
 class Counters(MeasurementBase):
     """ base class for multiple integer counters """
     def __init__(self, **kwargs):
-        [setattr(self,key,value) for key,value in kwargs.items()]
+        super().__init__(**kwargs)
         self.counters = collections.defaultdict(int)
     def get(self):
         return [(count,name) for name,count in self.counters.items()]
@@ -156,23 +159,34 @@ class TokenizedBio(object):
 # these classes provide specialized 'get' methods
 # for classes with 'counters' members
 
-class GetTopCounts(object):
+class GetBase(object):
+    """ 
+    base class for classes implementing "get";
+    sanitizes counter names for output to CSV
+    """
+    def get_init(self):
+        self.counters = {sanitize_string(name):count for name,count in self.counters.items()}
+
+class GetTopCounts(GetBase):
     """ provides a 'get' method that deals with top-n type measurements 
         must define a 'self.counters' variable """
     def get(self):
+        self.get_init()
         if not hasattr(self,'top_k'):
             setattr(self,'top_k',20)
         sorted_top = list( reversed(sorted(self.counters.items(),key=operator.itemgetter(1))) ) 
         return [(count,name) for name,count in sorted_top[:self.top_k] ] 
-class GetCutoffCounts(object):
+class GetCutoffCounts(GetBase):
     """ drops items with < 'min_n'/3 counts """
     def get(self):
+        self.get_init()
         if not hasattr(self,'min_n'):
             setattr(self,'min_n',3)
         self.counters = { token:count for token,count in self.counters.items() if count >= self.min_n }
         return [(count,name) for name,count in self.counters.items() ]
 class GetCutoffTopCounts(GetCutoffCounts):
     def get(self):
+        self.get_init()
         if not hasattr(self,'top_k'):
             setattr(self,'top_k',20)
         self.counters = super(GetCutoffTopCounts).get()
