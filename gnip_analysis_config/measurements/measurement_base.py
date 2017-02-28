@@ -14,7 +14,7 @@ the following methods:
 
 The 'add_tweet' function is the entry point; it takes a dict representing a
 JSON-formatted Tweet payload. The 'get' function is the exit; it returns a 
-sequence of tuples of ( current count, count name). Any number of counts may
+sequence of tuples of (current count, count name). Any number of counts may
 be managed by a single measurement class.
 
 --------------------
@@ -35,9 +35,14 @@ Usage:
 
 All classes inheriting from MeasurementBase must define or inherit the methods:
  - update(dict: tweet):
-    udpates internal data store with Tweet info; no return value
+    updates internal data store with Tweet info; no return value
  - get():
     returns a representation of internal data store
+Optionally, a class may define:
+ - combine(obj: other_measurement)
+    updates the current measurement with the data in "other_measurment"
+This method defines the way in which two measurement instances of
+the same type are combined.
 
 Measurements can be selectively applied to tweets by
 defining the class member 'filters', which is a list of 3-tuples:
@@ -107,7 +112,7 @@ class Counters(MeasurementBase):
         super().__init__(**kwargs)
         self.counters = collections.defaultdict(int)
     def get(self):
-        return [(count,name) for name,count in self.counters.items()]
+        return [(count,sanitize_string(name)) for name,count in self.counters.items()]
     def combine(self,new_counters):
         for new_name,new_count in new_counters.counters.items():
             if new_name in self.counters.keys():
@@ -156,6 +161,17 @@ class TokenizedBio(object):
                 good_tokens.append(token)
         return good_tokens
 
+# this class provides a generic update method multi-counter classes
+
+class CountersOfTokens(Counters):
+    """
+    this class provides a generic update method
+    for multi-counter classes implementing "get_tokens" 
+    """
+    def update(self,tweet):
+        for token in self.get_tokens(tweet):
+            self.counters[token] += 1
+
 # these classes provide specialized 'get' methods
 # for classes with 'counters' members
 
@@ -195,16 +211,10 @@ class GetCutoffTopCounts(GetCutoffCounts):
 
 # term counter helpers
 
-class BodyTermCounters(Counters,TokenizedBody):
+class BodyTermCounters(CountersOfTokens,TokenizedBody):
     """ provides an update method that counts instances of tokens in body """
-    def update(self,tweet):
-        for token in self.get_tokens(tweet):
-            self.counters[token] += 1
-class BioTermCounters(Counters,TokenizedBio):
+class BioTermCounters(CountersOfTokens,TokenizedBio):
     """ provides an update method that counts instances of tokens in bio"""
-    def update(self,tweet):
-        for token in self.get_tokens(tweet):
-            self.counters[token] += 1
 
 class SpecifiedBodyTermCounters(Counters,TokenizedBody):
     """ base class for integer counts of specified body terms
@@ -247,40 +257,38 @@ class CutoffMentions(GetCutoffCounts,MentionCounters):
 class CutoffTopMentions(GetCutoffTopCounts,MentionCounters):
     pass
 
-class CutoffTopBioTermsUniqUser(GetCutoffTopCounts,Counters,TokenizedBio):
-    def __init__(self, **kwargs):
-        [setattr(self,key,value) for key,value in kwargs.items()]
-        self.users = []
-        super(CutoffTopBioTermsUniqUser,self).__init__()
-    def update(self,tweet):
-        if tweet['actor']['id'] not in self.users:
-            for token in self.get_tokens(tweet):
-                self.counters[token] += 1
-            self.users.append(tweet['actor']['id'])
-
 #
 # NLP
 #
-class POSCounter(Counter):
-    def get_pos(self,rep, pos="NN"):
-        ans = []
-        for s in rep["sentences"]:
-            for i in range(len(s["tokens"])):
-                if s["pos"][i] == pos:
-                    ans.append(s["lemmas"][i])
-        return ans  
-class BodyNNCounter(POSCounter):
-    def update(self,tweet):
-        rep = tweet["enrichments"]["BodyNLPEnrichment"]
-        ans = self.get_pos(rep,pos="NN")
-        self.counter += len(ans)
-class BodyNNPCounter(POSCounter):
-    def update(self,tweet):
-        rep = tweet["enrichments"]["BodyNLPEnrichment"]
-        ans = self.get_pos(rep,pos="NNP")
-        self.counter += len(ans)
-class BodyDTCounter(POSCounter):
-    def update(self,tweet):
-        rep = tweet["enrichments"]["BodyNLPEnrichment"]
-        ans = self.get_pos(rep,pos="DT")
-        self.counter += len(ans)
+class NLTKBodyPOS():
+    def get_tokens(self,tweet):
+        tokens = []
+        for token,pos in tweet["enrichments"]["NLTKPOSBody"]: 
+            if pos == self.requested_pos:
+                tokens.append(token)
+        return tokens
+class NLTKBioPOS():
+    def get_tokens(self,tweet):
+        tokens = []
+        for token,pos in tweet["enrichments"]["NLTKPOSBio"]: 
+            if pos == self.requested_pos:
+                tokens.append(token)
+        return tokens
+class NLTKBodyNN(NLTKBodyPOS):
+    requested_pos = "NN"
+class NLTKBioNN(NLTKBioPOS):
+    requested_pos = "NN"
+class NLTKBodyNNP(NLTKBodyPOS):
+    requested_pos = "NNP"
+class NLTKBioNNP(NLTKBioPOS):
+    requested_pos = "NNP"
+
+class BodyNNCounters(CountersOfTokens,NLTKBodyNN):
+    """ counts instances of NN tokens in body """
+class BioNNCounters(CountersOfTokens,NLTKBioNN):
+    """ counts instances of NN tokens in bio"""
+class BodyNNPCounters(CountersOfTokens,NLTKBodyNNP):
+    """ counts instances of NNP tokens in body """
+class BioNNPCounters(CountersOfTokens,NLTKBioNNP):
+    """ counts instances of NNP tokens in bio"""
+
