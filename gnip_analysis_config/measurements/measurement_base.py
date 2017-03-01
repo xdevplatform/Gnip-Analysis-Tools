@@ -260,6 +260,10 @@ class CutoffTopMentions(GetCutoffTopCounts,MentionCounters):
 #
 # NLP
 #
+
+# NLTK uses (by default) the Penn Treebank tags:
+# http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+
 class NLTKBodyPOS():
     def get_tokens(self,tweet):
         tokens = []
@@ -274,21 +278,47 @@ class NLTKBioPOS():
             if pos == self.requested_pos:
                 tokens.append(token)
         return tokens
-class NLTKBodyNN(NLTKBodyPOS):
-    requested_pos = "NN"
-class NLTKBioNN(NLTKBioPOS):
-    requested_pos = "NN"
-class NLTKBodyNNP(NLTKBodyPOS):
-    requested_pos = "NNP"
-class NLTKBioNNP(NLTKBioPOS):
-    requested_pos = "NNP"
 
-class BodyNNCounters(CountersOfTokens,NLTKBodyNN):
+"""
+TODO
+class CoreNLPBodyPOS():
+    def get_tokens(self,tweet):
+        tokens = []
+        for token,pos in tweet["enrichments"]["CoreNLPPOSBody"]: 
+            if pos == self.requested_pos:
+                tokens.append(token)
+        return tokens
+class CoreNLPBioPOS():
+    def get_tokens(self,tweet):
+        tokens = []
+        for token,pos in tweet["enrichments"]["CoreNLPPOSBio"]: 
+            if pos == self.requested_pos:
+                tokens.append(token)
+        return tokens
+"""
+
+class BodyNNCountersNLTK(CountersOfTokens,NLTKBodyPOS):
     """ counts instances of NN tokens in body """
-class BioNNCounters(CountersOfTokens,NLTKBioNN):
+    requested_pos = "NN"
+class BioNNCountersNLTK(CountersOfTokens,NLTKBioPOS):
     """ counts instances of NN tokens in bio"""
-class BodyNNPCounters(CountersOfTokens,NLTKBodyNNP):
+    requested_pos = "NN"
+class BodyNNPCountersNLTK(CountersOfTokens,NLTKBodyPOS):
     """ counts instances of NNP tokens in body """
-class BioNNPCounters(CountersOfTokens,NLTKBioNNP):
+    requested_pos = "NNP"
+class BioNNPCountersNLTK(CountersOfTokens,NLTKBioPOS):
     """ counts instances of NNP tokens in bio"""
+    requested_pos = "NNP"
+class BodyNNSCountersNLTK(CountersOfTokens,NLTKBodyPOS):
+    """ counts instances of NNS tokens in body """
+    requested_pos = "NNS"
+class BioNNSCountersNLTK(CountersOfTokens,NLTKBioPOS):
+    """ counts instances of NNS tokens in bio"""
+    requested_pos = "NNS"
+class BodyNNPSCountersNLTK(CountersOfTokens,NLTKBodyPOS):
+    """ counts instances of NNPS tokens in body """
+    requested_pos = "NNPS"
+class BioNNPCountersNLTK(CountersOfTokens,NLTKBioPOS):
+    """ counts instances of NNP tokens in bio"""
+    requested_pos = "NNP"
 
