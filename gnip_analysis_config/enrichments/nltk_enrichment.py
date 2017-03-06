@@ -1,4 +1,4 @@
-from .enrichments import BaseEnrichment
+from .enrichment_base import BaseEnrichment
 from nltk.tokenize import SpaceTokenizer
 from nltk.tokenize import word_tokenize
 from nltk.tokenize.casual import TweetTokenizer

@@ -1,6 +1,3 @@
-# add measurement definitions to this list to activate
-measurements_list = []
-
 # these measurement class definitions are explicit, and do
 # not inherit from MeasurementBase
 class TweetCounter(object):
@@ -28,4 +25,3 @@ class ReTweetCounter(object):
     def combine(self,new):
         self.counter += new.counter
 
-measurements_list.extend([TweetCounter, ReTweetCounter])
