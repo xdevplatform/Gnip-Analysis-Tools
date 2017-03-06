@@ -17,7 +17,7 @@ config_kwargs  = {
     "hll_size": 5
     }
 
-measurements_list = [
+measurement_class_list = [
         CountVolumeCountryNormalizedTerms, 
         CountUniqueUsersPerTerm
         ]
