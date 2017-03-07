@@ -24,9 +24,9 @@ class CountVolumeNormalizedTerms(MeasurementBase, TokenizedBody):
         for token in self.get_tokens(tweet):
             if token in self.terms:
                 category = self.get_category_key(tweet)
-                if category not in self.token_volumes_by_category:
-                    category = "other"
-                self.token_volumes_by_category[category][token] += 1
+                # if that category is not in self.token_volumes_by_categroy, it isn't recorded
+                if category in self.token_volumes_by_category:
+                    self.token_volumes_by_category[category][token] += 1
                 self.token_volumes_by_category["total"][token] += 1
     def combine(self,new_counters):
         """combine two CountVolumeNormalizedTerms objects"""
@@ -52,7 +52,10 @@ class CountVolumeNormalizedTerms(MeasurementBase, TokenizedBody):
             for token in self.token_volumes_by_category[category]:
                 count = self.token_volumes_by_category[category][token]
                 name = token + "/" + category + "*" + str(total_norm_vols) + "/" + str(total_all_tokens)
-                results.append(((count*total_norm_vols)/(category_vol*total_all_tokens), name))
+                if category_vol == 0:
+                    results.append((0.0, name))
+                else:
+                    results.append(((count*total_norm_vols)/(category_vol*total_all_tokens), name))
         return results
     def get_normalization_info(self,date_key):
         raise NotImplementedError
