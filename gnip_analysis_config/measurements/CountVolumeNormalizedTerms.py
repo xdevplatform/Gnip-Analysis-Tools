@@ -30,9 +30,12 @@ class CountVolumeNormalizedTerms(MeasurementBase, TokenizedBody):
                 self.token_volumes_by_category["total"][token] += 1
     def combine(self,new_counters):
         """combine two CountVolumeNormalizedTerms objects"""
-        for new_catagory,new_category_dict in new_counters.token_volumes_by_category.items():
+        # for each category and token count dict
+        for new_category,new_category_dict in new_counters.token_volumes_by_category.items():
+            # if the category is in our list of categories
             if new_category in self.token_volumes_by_category:
-                for new_category,new_count in new_counters.items():
+                # for that category, look at each token
+                for new_token,new_count in new_category_dict.items():
                     if new_token in self.token_volumes_by_category[new_category]:
                         self.token_volumes_by_category[new_category][new_token] += new_count
                     else:
