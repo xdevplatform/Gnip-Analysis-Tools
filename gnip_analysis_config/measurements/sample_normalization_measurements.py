@@ -1,6 +1,6 @@
 import fileinput
-from implemented_volume_normalizations import CountVolumeCountryNormalizedTerms
-from CountUniqueUsersPerTerm import CountUniqueUsersPerTerm
+from gnip_analysis_config.measurements.implemented_volume_normalizations import CountVolumeCountryNormalizedTerms
+from gnip_analysis_config.measurements.CountUniqueUsersPerTerm import CountUniqueUsersPerTerm
 
 #terms_list = []
 #for line in fileinput.FileInput("./terms_to_count.txt"):

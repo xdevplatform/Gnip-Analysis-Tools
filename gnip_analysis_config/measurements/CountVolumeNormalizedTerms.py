@@ -1,8 +1,5 @@
 import fileinput
-from measurement_base import MeasurementBase, TokenizedBody
-# need to import two functions: get_normaliation_info and get_category_key
-# these can be defined differently depending on the categories tha you are normalizing by
-#from country_volume_normalization import get_normalization_info, get_category_key
+from gnip_analysis_config.measurements.measurement_base import MeasurementBase, TokenizedBody
 
 class CountVolumeNormalizedTerms(MeasurementBase, TokenizedBody):
     """
