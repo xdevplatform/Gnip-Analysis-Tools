@@ -1,6 +1,6 @@
 import fileinput
 from HLL import HyperLogLog
-from measurement_base import MeasurementBase, TokenizedBody
+from gnip_analysis_config.measurements.measurement_base import MeasurementBase, TokenizedBody
 
 class CountUniqueUsersPerTerm(MeasurementBase, TokenizedBody):
     """

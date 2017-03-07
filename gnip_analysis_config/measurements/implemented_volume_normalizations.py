@@ -1,8 +1,7 @@
 from datetime import datetime
 import fileinput
 import os
-from CountVolumeNormalizedTerms import CountVolumeNormalizedTerms   
-
+from gnip_analysis_config.measurements.CountVolumeNormalizedTerms import CountVolumeNormalizedTerms   
 
 class CountVolumeCountryNormalizedTerms(CountVolumeNormalizedTerms):
     # helper functions 
