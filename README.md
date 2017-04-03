@@ -57,6 +57,8 @@ from gnip_analysis_config.enrichments import base_enrichment
 class MyEnrichment(enrichment_base.BaseEnrichment):
     def enrichment_value(self,tweet):
         return "my_test_enrichment_value"
+
+enrichment_class_list = [MyEnrichment] 
 ```
 
 ## Measurements
