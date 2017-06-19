@@ -30,7 +30,7 @@ class NLTKPOSBody(BaseEnrichment):
     def __init__(self):
         self.tagger = pos_tag
     def enrichment_value(self,tweet):
-        return self.tagger( tweet['enrichments']['NLTKWordTokenizeBody'] )
+        return self.tagger( tweet['enrichments']['NLTKTweetTokenizeBody'] )
 
 class NLTKTokenizeBio(BaseEnrichment):
     def enrichment_value(self,tweet):
@@ -68,7 +68,7 @@ class NLTKPOSBio(BaseEnrichment):
     def __init__(self):
         self.tagger = pos_tag
     def enrichment_value(self,tweet):
-        return self.tagger( tweet['enrichments']['NLTKWordTokenizeBio'] )
+        return self.tagger( tweet['enrichments']['NLTKTweetTokenizeBio'] )
 
 nltk_enrichments_list = [
         NLTKSpaceTokenizeBody,
