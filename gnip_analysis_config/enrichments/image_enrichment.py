@@ -18,11 +18,6 @@ from keras.applications.vgg16 import preprocess_input as vgg16_preprocess_input
 from keras.applications.vgg16 import decode_predictions as vgg16_decode_predictions
 
 
-class MyEnrichment(enrichment_base.BaseEnrichment):
-    def enrichment_value(self, tweet):
-        return "my_test_enrichment_value"
-
-
 class ImageLabelVGG16(enrichment_base.BaseEnrichment):
     def __init__(self):
         self.model = VGG16(weights='imagenet')
