@@ -1,0 +1,8 @@
+gnip-analysis-pipeline
+-e git+git@github.com:tw-ddis/Gnip-Analysis-Tools.git#egg=gnip_analysis_tools
+tensorflow
+keras
+ujson
+Pillow
+requests
+h5py
