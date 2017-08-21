@@ -12,20 +12,42 @@ from io import BytesIO
 import numpy as np
 from PIL import Image
 import requests
-from keras.preprocessing import image as keras_image
+from keras.preprocessing import image as k_image
 from keras.applications.vgg16 import VGG16
-from keras.applications.vgg16 import preprocess_input as vgg16_preprocess_input
-from keras.applications.vgg16 import decode_predictions as vgg16_decode_predictions
+from keras.applications.vgg16 import preprocess_input as k_preprocess_input
+from keras.applications.vgg16 import decode_predictions as k_decode_predictions
 
 
-class ImageLabelVGG16(enrichment_base.BaseEnrichment):
+class ImageLabel(enrichment_base.BaseEnrichment):
+    """Image label prediction base class.
+
+    This class defines the basic functionality needed to instantiate a pretrained model 
+    and apply it to new data for label predictions. Specific model-based predictions are 
+    created by inheriting from this class. The methods and workflow are based on (and 
+    modified from) the snippets in the Keras documentation: https://keras.io/applications/ 
+    """
     def __init__(self):
-        self.model = VGG16(weights='imagenet')
+        """Set general ImageLabel attributes."""
         # note: topk is hard-coded for now. the model will always return 
         #   `topk` predictions, regardless of the probability score 
         self.topk = 5 
 
     def enrichment_value(self, tweet):
+        """Extract image from passed Tweet and (if applicable), make image label 
+        classifications on it. If image predictions are made, a list of the `topk` 
+        predictions and associated probabilities are returned. If no images are found, 
+        None is returned. 
+
+        Parameters
+        ----------
+        tweet : dict
+            Tweet in JSON-formatted dict structure
+
+        Returns
+        -------
+        output : list or None 
+            List of label predictions and probabilities or None. 
+        """
         img = self._get_image_from_tweet(tweet)
         if img:
             predictions = self._make_predictions(img, topk=self.topk)
@@ -133,14 +155,14 @@ class ImageLabelVGG16(enrichment_base.BaseEnrichment):
         # resize image according to model specs
         target_size = (224, 224)
         img = img.resize((target_size[1], target_size[0]))
-        x = keras_image.img_to_array(img)
+        x = k_image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
-        x = vgg16_preprocess_input(x)
+        x = k_preprocess_input(x)
 
         # models return a numpy array of predictions
         preds = self.model.predict(x)
         # lookup for translattion to named labels
-        output = vgg16_decode_predictions(preds, top=topk)[0]
+        output = k_decode_predictions(preds, top=topk)[0]
         return output
 
     def _format_output(self, predictions):
@@ -162,6 +184,21 @@ class ImageLabelVGG16(enrichment_base.BaseEnrichment):
         for item in predictions:
             output.append((str(item[1]), str(item[2]), str(item[0])))
         return output
+
+
+class ImageLabelVGG16(ImageLabel):
+    """Image label predictions based on pre-trained VGG16 model.
+
+    This class uses pre-trained weights and labels to make image classification predictions
+    based on the open-sourced VGG16 model. The methods and workflow are based on (and 
+    modified from) the snippets in the Keras documentation: https://keras.io/applications/#vgg16  
+
+    Much of the heavy lifting in this object comes from the base ImageLabel class. This class 
+    defines the specific model to use (VGG16).  
+    """
+    def __init__(self):
+        super().__init__()
+        self.model = VGG16(weights='imagenet')
 
 
 image_enrichments_list = [ImageLabelVGG16]
