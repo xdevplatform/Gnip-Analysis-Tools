@@ -1,8 +1,6 @@
-gnip-analysis-pipeline
 -e git+git@github.com:tw-ddis/Gnip-Analysis-Tools.git#egg=gnip_analysis_tools
-tensorflow
-keras
-ujson
+tensorflow>=1.2
+keras>=2.0
 Pillow
 requests
 h5py
