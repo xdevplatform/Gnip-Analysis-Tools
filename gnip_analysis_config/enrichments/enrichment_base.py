@@ -13,6 +13,7 @@ class GenericModelEnrichment(object):
         if "enrichments" not in tweet:
             tweet['enrichments'] = {}
         tweet['enrichments'][self.__class__.__name__] = enrichment_value
+        return tweet
 
 
 class BaseEnrichment(object):
@@ -30,5 +31,6 @@ class BaseEnrichment(object):
         if "enrichments" not in tweet:
             tweet['enrichments'] = {}
         tweet['enrichments'][self.__class__.__name__] = self.enrichment_value(tweet)
+        return tweet
 
 
