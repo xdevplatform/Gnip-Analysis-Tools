@@ -1,6 +1,6 @@
 import fileinput
 from HLL import HyperLogLog
-from gnip_analysis_config.measurements.measurement_base import MeasurementBase, TokenizedBody
+from gnip_analysis_tools.measurements.measurement_base import MeasurementBase, TokenizedBody
 
 # have to define these at the top level of the module, so that they will be pickleable
 # create a private _set or _HyperLogLog class that defines the same API for interacting

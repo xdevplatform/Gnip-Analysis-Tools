@@ -5,7 +5,7 @@
 #
 # (env) $ bash image-build.sh 
 
-from gnip_analysis_config.enrichments import enrichment_base
+from gnip_analysis_tools.enrichments import enrichment_base
 
 import logging
 from io import BytesIO

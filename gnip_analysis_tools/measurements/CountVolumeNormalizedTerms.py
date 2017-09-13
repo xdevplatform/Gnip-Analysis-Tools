@@ -1,5 +1,5 @@
 import fileinput
-from gnip_analysis_config.measurements.measurement_base import MeasurementBase, TokenizedBody, HashtagsBody
+from gnip_analysis_tools.measurements.measurement_base import MeasurementBase, TokenizedBody, HashtagsBody
 
 class CountVolumeNormalizedTerms(MeasurementBase, TokenizedBody):
     """
