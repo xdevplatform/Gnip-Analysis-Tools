@@ -1,9 +1,9 @@
-# The `gnip_analysis_config` Package
+# The `gnip_analysis_tools` Package
 
 This package provides useful class definitions for configuring scripts in the
 [Gnip-Analysis-Pipeline](https://github.com/jeffakolb/Gnip-Analysis-Pipeline) package.
 The intention is that you work from a working directory (we'll call this "TEST"), and that 
-both `gnip_analysis_pipeline` and `gnip_analysis_config` are installed as packages.
+both `gnip_analysis_pipeline` and `gnip_analysis_tools` are installed as packages.
 Remember that these packages can be installed from the cloned repo location with:
 
 ```bash
@@ -24,7 +24,7 @@ from your working directory, you would create an enrichments configuration file
 
 ```python
 
-from gnip_analysis_config.enrichments import test_enrichment
+from gnip_analysis_tools.enrichments import test_enrichment
 
 enrichment_class_list = [test_enrichment.TestEnrichment]
 ```
@@ -41,7 +41,7 @@ To configure an NLP enrichment with NLTK, we provide `nltk_enrichment.py`, which
 
 ```python
 
-from gnip_analysis_config.enrichments import nltk_enrichment
+from gnip_analysis_tools.enrichments import nltk_enrichment
 
 enrichment_class_list = nltk_enrichment.nltk_enrichments_list
 ```
@@ -52,7 +52,7 @@ A custom enrichment class can be defined locally:
 
 ```python
 
-from gnip_analysis_config.enrichments import base_enrichment
+from gnip_analysis_tools.enrichments import base_enrichment
 
 class MyEnrichment(enrichment_base.BaseEnrichment):
     def enrichment_value(self,tweet):
@@ -75,7 +75,7 @@ from your working directory, you would create an enrichments configuration file
 
 ```python
 
-from gnip_analysis_config.measurements.test_measurements import TweetCounter,ReTweetCounter
+from gnip_analysis_tools.measurements.test_measurements import TweetCounter,ReTweetCounter
 
 enrichment_class_list = [TweetCounter,ReTweetCounter]
 ```
@@ -96,7 +96,7 @@ key functionality from classes in `measurement_base.py`:
 
 ```python
 
-from gnip_analysis_config.measurements.measurement_base import Counters
+from gnip_analysis_tools.measurements.measurement_base import Counters
 
 class HashtagCounters(Counters):
     def update(self,tweet):
@@ -110,7 +110,3 @@ measurement_class_list = [ HashtagCounters ]
 
 See `measurement_base.py` for a full description of how to create custom measurement classes. 
 
-# The `gnip_analysis_tools` Package
-
-This package is a repository for common analysis tools. For example `nlp/utils.py` 
-defines some common choices for NLP utility functions.
