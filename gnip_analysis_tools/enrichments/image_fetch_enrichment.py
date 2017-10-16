@@ -74,7 +74,11 @@ class GetImage(enrichment_base.BaseEnrichment):
             PIL-formatted image file (or None)
         """
         image = None
-        response = requests.get(img_url)
+        try:
+            response = requests.get(img_url) 
+        except requests.exceptions.ChunkedEncodingError:
+            return None
+
         # convert binary data to PIL.Image
         if response.ok:
             image = Image.open(BytesIO(response.content))
@@ -85,5 +89,13 @@ class GetImage(enrichment_base.BaseEnrichment):
     def enrichment_value(self, tweet):
         image_obj = self._get_image_from_tweet(tweet)  
         return image_obj
-        #return jsonpickle.dumps(image_obj)
+
+class GetImageJSON(GetImage):
+    
+    def enrichment_value(self, tweet):
+        """
+        return JSON-serialized image object
+        """
+        image_obj = self._get_image_from_tweet(tweet)  
+        return jsonpickle.dumps(image_obj)
 

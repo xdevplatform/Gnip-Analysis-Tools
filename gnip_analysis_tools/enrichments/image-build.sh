@@ -30,7 +30,7 @@ import requests
 # instantiate model (will download weights) 
 model = VGG16(weights='imagenet')
 # make a prediction (will download labels) 
-response = requests.get('https://pbs.twimg.com/profile_images/620254280490979328/M88ZsuCT_400x400.jpg')
+response = requests.get('https://pbs.twimg.com/profile_images/874490006966087682/Rva9WZbX_400x400.jpg')
 img = Image.open(BytesIO(response.content)).convert('RGB').resize((224,224))
 proc_img = preprocess_input(np.expand_dims(k_image.img_to_array(img), axis=0))
 output = decode_predictions(model.predict(proc_img), top=5)[0]
