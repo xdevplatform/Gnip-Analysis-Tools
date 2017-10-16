@@ -85,5 +85,10 @@ class GetImage(enrichment_base.BaseEnrichment):
     def enrichment_value(self, tweet):
         image_obj = self._get_image_from_tweet(tweet)  
         return image_obj
-        #return jsonpickle.dumps(image_obj)
+
+class GetImageJSON(GetImage):
+    
+    def enrichment_value(self, tweet):
+        image_obj = self._get_image_from_tweet(tweet)  
+        return jsonpickle.dumps(image_obj)
 

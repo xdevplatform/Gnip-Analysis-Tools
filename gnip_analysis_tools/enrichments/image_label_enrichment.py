@@ -48,14 +48,25 @@ class ImageLabel(enrichment_base.BaseEnrichment):
         output : list or None 
             List of label predictions and probabilities or None. 
         """
-        img = tweet['enrichments']['GetImage']
-        #img = jsonpickle.loads(tweet['enrichments']['GetImage'])
+        img = None
+        if 'GetImage' in tweet['enrichments']:
+            img = tweet['enrichments']['GetImage'] 
+        elif 'GetImageJSON' in tweet['enrichments']:
+            img = tweet['enrichments']['GetImageJSON'] 
+            if img is not None:
+                img = jsonpickle.loads(img)   
+        
         if img:
             predictions = self._make_predictions(img, topk=self.topk)
             output = self._format_output(predictions)
         else:
             output = None
-        del tweet['enrichments']['GetImage']
+        
+        if 'GetImage' in tweet['enrichments']:
+            del tweet['enrichments']['GetImage']
+        if 'GetImageJSON' in tweet['enrichments']:
+            del tweet['enrichments']['GetImageJSON']
+        
         return output
 
     def _make_predictions(self, img, topk):
@@ -129,5 +140,7 @@ class ImageLabelVGG16(ImageLabel):
         super().__init__()
         self.model = VGG16(weights='imagenet')
 
-
-image_enrichments_list = [image_fetch_enrichment.GetImage,ImageLabelVGG16]
+# we have to specify a default number of workers per enrichment;
+# probably better to customize this
+image_enrichments_list = [(image_fetch_enrichment.GetImage,20),(ImageLabelVGG16,1)]
+image_enrichments_list_json = [(image_fetch_enrichment.GetImageJSON,20),(ImageLabelVGG16,1)]
