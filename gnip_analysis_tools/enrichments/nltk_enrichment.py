@@ -71,12 +71,12 @@ class NLTKPOSBio(BaseEnrichment):
         return self.tagger( tweet['enrichments']['NLTKTweetTokenizeBio'] )
 
 nltk_enrichments_list = [
-        NLTKSpaceTokenizeBody,
-        NLTKWordTokenizeBody,
-        NLTKTweetTokenizeBody,
-        NLTKPOSBody,
-        NLTKSpaceTokenizeBio,
-        NLTKWordTokenizeBio,
-        NLTKTweetTokenizeBio,
-        NLTKPOSBio,
+        (NLTKSpaceTokenizeBody,1),
+        (NLTKWordTokenizeBody,1),
+        (NLTKTweetTokenizeBody,1),
+        (NLTKPOSBody,1),
+        (NLTKSpaceTokenizeBio,1),
+        (NLTKWordTokenizeBio,1),
+        (NLTKTweetTokenizeBio,1),
+        (NLTKPOSBio,1),
         ]
