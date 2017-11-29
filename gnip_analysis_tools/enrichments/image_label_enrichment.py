@@ -145,5 +145,6 @@ class ImageLabelVGG16(ImageLabel):
         self.model = VGG16(weights='imagenet')
 
 # we have to specify a default number of workers per enrichment;
+# probably better to customize this
 image_enrichments_list = [(image_fetch_enrichment.GetImage,20),(ImageLabelVGG16,1)]
 image_enrichments_list_json = [(image_fetch_enrichment.GetImageJSON,20),(ImageLabelVGG16,1)]
