@@ -77,7 +77,7 @@ from your working directory, you would create an enrichments configuration file
 
 from gnip_analysis_tools.measurements.test_measurements import TweetCounter,ReTweetCounter
 
-enrichment_class_list = [TweetCounter,ReTweetCounter]
+measurement_class_list = [TweetCounter,ReTweetCounter]
 ```
 
 We can the build time series from the Tweets in `my_enriched_tweets.json` as follows:
