@@ -6,12 +6,12 @@
 # (env) $ bash image-build.sh 
 
 from gnip_analysis_tools.enrichments import enrichment_base
+from gnip_analysis_tools.enrichments import image_fetch_enrichment
 
-import logging
-from io import BytesIO
 import numpy as np
-from PIL import Image
-import requests
+import jsonpickle
+import sys
+
 from keras.preprocessing import image as k_image
 from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input as k_preprocess_input
@@ -48,86 +48,30 @@ class ImageLabel(enrichment_base.BaseEnrichment):
         output : list or None 
             List of label predictions and probabilities or None. 
         """
-        img = self._get_image_from_tweet(tweet)
+        img = None
+
+        # if the image has been stored as a PIL object
+        if 'GetImage' in tweet['enrichments']:
+            img = tweet['enrichments']['GetImage'] 
+        # if the image has been serialized with jsonpickle
+        elif 'GetImageJSON' in tweet['enrichments']:
+            img = tweet['enrichments']['GetImageJSON'] 
+            if img is not None:
+                img = jsonpickle.loads(img)   
+        
         if img:
             predictions = self._make_predictions(img, topk=self.topk)
             output = self._format_output(predictions)
         else:
             output = None
+        
+        # don't retain image info in enriched tweet
+        if 'GetImage' in tweet['enrichments']:
+            del tweet['enrichments']['GetImage']
+        if 'GetImageJSON' in tweet['enrichments']:
+            del tweet['enrichments']['GetImageJSON']
+        
         return output
-
-    def _get_image_from_tweet(self, tweet):
-        """
-        Extract an image file from the URL in a given Tweet.
-
-        Parameters
-        ----------
-        tweet : dict
-            Tweet in JSON-formatted dict structure
-
-        Returns
-        -------
-        image
-            PIL-formatted image file (or None)
-        """
-        image = None
-        img_url = self._get_img_url(tweet)
-        if img_url:
-            image = self._download_image(img_url)
-        else:
-            logging.info('failed to get image for tweet id={}'.format(tweet['id']))
-        return image
-
-    def _get_img_url(self, tweet):
-        """
-        Helper function to extract an image URL (or None) from a Tweet.
-        Currently supports only Activity Streams format. Handles (potential non-)
-            existance of relevant payload elements.
-
-        Parameters
-        ----------
-        tweet : dict
-            Tweet in JSON-formatted dict structure
-        Returns
-        -------
-        url : str
-            String URL to image location (on twitter.com server) (or None)
-        """
-        media_url = None
-        if 'twitter_entities' not in tweet or 'media' not in tweet['twitter_entities']:
-            logging.info('no image found in tweet id={}'.format(tweet['id']))
-            return media_url
-        try:
-            media_url = tweet['twitter_entities']['media'][0]['media_url']
-        except KeyError:
-            logging.info('Failed to extract image URL for tweet id={}'.format(tweet['id']))
-        return media_url
-
-    def _download_image(self, img_url):
-        """
-        Download the image located at the given URL. This method overlaps with
-        keras.preprocessing.image.load_img(), but does not look to a local file
-        path. See also:
-        https://github.com/fchollet/keras/blob/master/keras/preprocessing/image.py
-
-        Parameters
-        ----------
-        img_url : str
-            String URL to location of image.
-
-        Returns
-        -------
-        image
-            PIL-formatted image file (or None)
-        """
-        image = None
-        response = requests.get(img_url)
-        # convert binary data to PIL.Image
-        if response.ok:
-            image = Image.open(BytesIO(response.content))
-        else:
-            logging.info('HTTP error={} for URL={}'.format(response.status_code, img_url))
-        return image
 
     def _make_predictions(self, img, topk):
         """
@@ -200,5 +144,6 @@ class ImageLabelVGG16(ImageLabel):
         super().__init__()
         self.model = VGG16(weights='imagenet')
 
-
-image_enrichments_list = [ImageLabelVGG16]
+# we have to specify a default number of workers per enrichment;
+image_enrichments_list = [(image_fetch_enrichment.GetImage,5),(ImageLabelVGG16,1)]
+image_enrichments_list_json = [(image_fetch_enrichment.GetImageJSON,5),(ImageLabelVGG16,1)]

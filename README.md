@@ -1,7 +1,7 @@
 # The `gnip_analysis_tools` Package
 
 This package provides useful class definitions for configuring scripts in the
-[Gnip-Analysis-Pipeline](https://github.com/jeffakolb/Gnip-Analysis-Pipeline) package.
+[Gnip-Analysis-Pipeline](https://github.com/tw-ddis/Gnip-Analysis-Pipeline) package.
 The intention is that you work from a working directory (we'll call this "TEST"), and that 
 both `gnip_analysis_pipeline` and `gnip_analysis_tools` are installed as packages.
 Remember that these packages can be installed from the cloned repo location with:
@@ -13,7 +13,7 @@ Remember that these packages can be installed from the cloned repo location with
 ## Enrichments
 
 According to the Gnip-Analysis-Pipeline 
-[docs](https://github.com/jeffakolb/Gnip-Analysis-Pipeline/blob/master/README.md), 
+[docs](https://github.com/tw-ddis/Gnip-Analysis-Pipeline/blob/master/README.md), 
 we configure enrichments by defining
 the `enrichment_class_list` variable in a configuration file.
 
@@ -26,7 +26,8 @@ from your working directory, you would create an enrichments configuration file
 
 from gnip_analysis_tools.enrichments import test_enrichment
 
-enrichment_class_list = [test_enrichment.TestEnrichment]
+parallel_factor = 1
+enrichment_class_list = [(test_enrichment.TestEnrichment,parallel_factor)]
 ```
 
 We can the enrich the Tweets in `my_tweets.json` as follows:
@@ -58,13 +59,14 @@ class MyEnrichment(enrichment_base.BaseEnrichment):
     def enrichment_value(self,tweet):
         return "my_test_enrichment_value"
 
-enrichment_class_list = [MyEnrichment] 
+parallel_factor = 1
+enrichment_class_list = [(MyEnrichment,parallel_factor)] 
 ```
 
 ## Measurements
 
 According to the Gnip-Analysis-Pipeline 
-[docs](https://github.com/jeffakolb/Gnip-Analysis-Pipeline/blob/master/README.md), 
+[docs](https://github.com/tw-ddis/Gnip-Analysis-Pipeline/blob/master/README.md), 
 we configure measurementss by defining
 the `measurements_class_list` variable in a configuration file.
 

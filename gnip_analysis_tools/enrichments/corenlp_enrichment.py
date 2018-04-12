@@ -12,5 +12,5 @@ class TokenizeBody(BaseEnrichment):
 
 
 corenlp_enrichments_list = [
-        NLTKSpaceTokenizeBody,
+        (NLTKSpaceTokenizeBody,1)
         ]
